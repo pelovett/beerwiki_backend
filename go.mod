@@ -1,6 +1,6 @@
 module github.com/pelovett/beerwiki_backend
 
-go 1.22rc2
+go 1.22
 
 require (
 	github.com/bytedance/sonic v1.9.1 // indirect
