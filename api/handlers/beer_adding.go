@@ -16,9 +16,9 @@ func GetBeer(c *gin.Context) {
 	db_host := os.Getenv("DB_HOST")
 	db_pass := os.Getenv("DB_PASSWORD")
 
-    psqlInfo := fmt.Sprintf("host=%s port=5432 user=postgres "+
-    "password=%s dbname=postgres sslmode=disable",
-    db_host, db_pass)
+	psqlInfo := fmt.Sprintf("host=%s port=5432 user=postgres "+
+		"password=%s dbname=postgres sslmode=disable",
+		db_host, db_pass)
 
 	db, err := sql.Open("postgres", psqlInfo)
 
@@ -26,24 +26,24 @@ func GetBeer(c *gin.Context) {
 		panic(err)
 	}
 
-    id := c.Param("id")
-    
-    result, err := db.Query("SELECT name FROM beer WHERE id=%s ;", id)
+	id := c.Param("id")
 
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{
-            "message": "Beer not found",
-        })
-        return
-    }
-    var beer string
-    if result.Next() {
-        if err := result.Scan(&beer); err != nil {
-            log.Fatal(err)
-        }
-    }
+	result, err := db.Query("SELECT name FROM beer WHERE id=%s ;", id)
 
-    c.JSON(http.StatusOK, gin.H{
-        "message": beer,
-   })
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Beer not found",
+		})
+		return
+	}
+	var beer string
+	if result.Next() {
+		if err := result.Scan(&beer); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": beer,
+	})
 }

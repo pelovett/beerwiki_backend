@@ -3,12 +3,12 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
+	"github.com/pelovett/beerwiki_backend/api/handlers"
 	"log"
 	"net/http"
 	"os"
-    "github.com/pelovett/beerwiki_backend/api/handlers"
-	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -49,6 +49,6 @@ func main() {
 			"message": "pong",
 		})
 	})
-    r.GET("/beer", beer_adding.GetBeer)
+	r.GET("/beer", beer_adding.GetBeer)
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
