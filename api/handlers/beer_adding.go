@@ -27,12 +27,13 @@ func GetBeer(c *gin.Context) {
 	}
 
 	id := c.Param("id")
-
-	result, err := db.Query("SELECT name FROM beer WHERE id=%s ;", id)
+	fmt.Printf("The id is %s\n", id)
+	result, err := db.Query("SELECT name FROM beer WHERE id=$1", id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Beer not found",
+			"error":   err,
 		})
 		return
 	}
