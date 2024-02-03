@@ -40,7 +40,7 @@ func GetBeer(c *gin.Context) {
 	var beer string
 	if result.Next() {
 		if err := result.Scan(&beer); err != nil {
-			log.Println(`Failed to parse beer string id: %s`, id)
+			log.Printf(`Failed to parse beer string id: %s`, id)
 		}
 	}
 
