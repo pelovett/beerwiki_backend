@@ -1,0 +1,8 @@
+.env
+.git
+.gitignore
+fly.toml
+migrations
+LICENSE
+.env.dev
+README.md
