@@ -1,4 +1,4 @@
-package beer_adding
+package handlers
 
 import (
 	"database/sql"

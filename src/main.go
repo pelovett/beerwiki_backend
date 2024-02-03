@@ -49,6 +49,6 @@ func main() {
 			"message": "pong",
 		})
 	})
-	r.GET("/beer/:id", beer_adding.GetBeer)
+	r.GET("/beer/:id", handlers.GetBeer)
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

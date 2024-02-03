@@ -2,10 +2,9 @@
 
 FROM golang:1.22-rc-bookworm
 WORKDIR /app
-COPY go.mod go.sum ./
 
+COPY . .
 RUN go mod download
-COPY *.go ./
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /beer-backend
 
