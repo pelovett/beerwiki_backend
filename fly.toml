@@ -23,4 +23,4 @@ primary_region = 'sea'
 
 [env]
   PORT = 8080
-  GIN_MODE='release'
+  GIN_MODE='debug'

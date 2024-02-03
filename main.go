@@ -3,12 +3,13 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq"
-	"github.com/pelovett/beerwiki_backend/api/handlers"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
+	"github.com/pelovett/beerwiki_backend/api/handlers"
 )
 
 func main() {
@@ -22,15 +23,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	//defer db.Close()
 
 	// fmt.Printf("the host is %s\n", db_host)
 	// fmt.Printf("the pass is %s\n", db_pass)
 	r := gin.Default()
+	r.POST("/create-account", handlers.CreateUser)
+	//defer db.Close()
 	r.GET("/ping", func(c *gin.Context) {
 		result, err := db.Query("SELECT name FROM beer;")
 		if err != nil {
-
+			log.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": "Very bad",
 			})
@@ -49,6 +51,7 @@ func main() {
 			"message": "pong",
 		})
 	})
+
 	r.GET("/beer/:id", handlers.GetBeer)
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
