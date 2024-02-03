@@ -28,23 +28,31 @@ func GetBeer(c *gin.Context) {
 
 	id := c.Param("id")
 	fmt.Printf("The id is %s\n", id)
-	result, err := db.Query("SELECT name FROM beer WHERE id=$1", id)
+	result, err := db.Query("SELECT name FROM beer WHERE id=$1 limit 1;", id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Beer not found",
-			"error":   err,
 		})
+		log.Println(`Failed to run query: ${err}`)
 		return
 	}
 	var beer string
 	if result.Next() {
 		if err := result.Scan(&beer); err != nil {
-			log.Fatal(err)
+			log.Println(`Failed to parse beer string id: %s`, id)
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": beer,
-	})
+	if beer != "" {
+		fmt.Printf("Returning beer: %s\n", beer)
+		c.JSON(http.StatusOK, gin.H{
+			"message": beer,
+		})
+	} else {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "Beer not found",
+		})
+	}
+
 }
