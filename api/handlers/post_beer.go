@@ -12,8 +12,8 @@ import (
 )
 
 type beer struct {
-	id   int    `json:"id"`
-	name string `json:"name"`
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 func PostBeer(c *gin.Context) {
@@ -56,8 +56,8 @@ func addBeerDB(newBeer *beer) error {
 		return err
 	}
 
-	log.Println(newBeer.name)
-	_, err = db.Exec("INSERT INTO beer (name) VALUES ($1);", newBeer.name)
+	log.Println(newBeer.Name)
+	_, err = db.Exec("INSERT INTO beer (name) VALUES ($1);", newBeer.Name)
 
 	if err != nil {
 		log.Println(err)
