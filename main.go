@@ -53,5 +53,7 @@ func main() {
 	})
 
 	r.GET("/beer/:id", handlers.GetBeer)
+	// With id for editing beer?
+	r.POST("/beer", handlers.PostBeer)
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
