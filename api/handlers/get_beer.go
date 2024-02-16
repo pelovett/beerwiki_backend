@@ -27,14 +27,14 @@ func GetBeer(c *gin.Context) {
 	}
 
 	id := c.Param("id")
-	fmt.Printf("The id is %s\n", id)
+	log.Printf("The id is %s\n", id)
 	result, err := db.Query("SELECT name FROM beer WHERE id=$1 limit 1;", id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Beer not found",
 		})
-		log.Println(`Failed to run query: ${err}`)
+		log.Printf(`Failed to run query: %s`, err)
 		return
 	}
 	var beer string
@@ -45,7 +45,7 @@ func GetBeer(c *gin.Context) {
 	}
 
 	if beer != "" {
-		fmt.Printf("Returning beer: %s\n", beer)
+		log.Printf("Returning beer: %s\n", beer)
 		c.JSON(http.StatusOK, gin.H{
 			"message": beer,
 		})

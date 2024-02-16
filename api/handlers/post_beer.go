@@ -21,23 +21,20 @@ func PostBeer(c *gin.Context) {
 	var newBeer beer
 
 	if err := c.BindJSON(&newBeer); err != nil {
-		log.Println(`Failed to bind inputted json to beer with err${err}`)
+		log.Printf("Failed to bind inputted json to beer with err %s", err)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
 	log.Println(newBeer)
 
-	c.IndentedJSON(http.StatusCreated, newBeer)
-	// c.JSON(http.StatusCreated, gin.H{
-	//  "message": newBeer.name,
-	// })
-
-	fmt.Println(newBeer)
-
 	if err := addBeerDB(&newBeer); err != nil {
-		log.Println("Failed to insert beer into database")
-		log.Println(err)
+		log.Printf("Failed to insert beer into database: %s", err)
+		c.Status(http.StatusInternalServerError)
+		return
 	}
+
+	c.IndentedJSON(http.StatusCreated, newBeer)
 }
 
 func addBeerDB(newBeer *beer) error {
