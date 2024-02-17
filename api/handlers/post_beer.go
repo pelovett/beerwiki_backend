@@ -6,14 +6,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
 
 type beer struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	URLName   string `json:"url_name"`
+	PageIPAML string `json:"page_ipa_ml"`
 }
 
 func PostBeer(c *gin.Context) {
@@ -26,7 +29,19 @@ func PostBeer(c *gin.Context) {
 		return
 	}
 
-	log.Println(newBeer)
+	legal_url_regex, err := regexp.Compile("^[A-Za-z0-9\\(\\)\\_]*$")
+	if err != nil {
+		log.Printf("Failed to compile Regex??? Shouldn't happen")
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	if !legal_url_regex.Match([]byte(newBeer.URLName)) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": fmt.Sprintf("Illegal url_name: %s", newBeer.URLName),
+		})
+		return
+	}
 
 	if err := addBeerDB(&newBeer); err != nil {
 		log.Printf("Failed to insert beer into database: %s", err)
@@ -53,8 +68,8 @@ func addBeerDB(newBeer *beer) error {
 		return err
 	}
 
-	log.Println(newBeer.Name)
-	_, err = db.Exec("INSERT INTO beer (name) VALUES ($1);", newBeer.Name)
+	_, err = db.Exec("INSERT INTO beer (name, url_name, page_ipa_ml) VALUES ($1, $2 ,$3);",
+		newBeer.Name, newBeer.URLName, newBeer.PageIPAML)
 
 	if err != nil {
 		log.Println(err)
