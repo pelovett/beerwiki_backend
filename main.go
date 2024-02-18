@@ -1,11 +1,7 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
-	"log"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -13,47 +9,22 @@ import (
 )
 
 func main() {
-	db_host := os.Getenv("DB_HOST")
-	db_pass := os.Getenv("DB_PASSWORD")
-	psqlInfo := fmt.Sprintf("host=%s port=5432 user=postgres "+
-		"password=%s dbname=postgres sslmode=disable",
-		db_host, db_pass)
-
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-
-	// fmt.Printf("the host is %s\n", db_host)
-	// fmt.Printf("the pass is %s\n", db_pass)
 	r := gin.Default()
-	r.POST("/create-account", handlers.CreateUser)
-	//defer db.Close()
-	r.GET("/ping", func(c *gin.Context) {
-		result, err := db.Query("SELECT name FROM beer;")
-		if err != nil {
-			log.Println(err)
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "Very bad",
-			})
-			return
-		}
-		var beerName string
-		if result.Next() {
-			fmt.Printf("Result next ran\n")
-			if err := result.Scan(&beerName); err != nil {
-				log.Fatal(err)
-			}
-		}
-		fmt.Printf("The result is %s\n", beerName)
 
+	// Debug
+	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
 
+	// Account Management
+	r.POST("/create-account", handlers.CreateUser)
+
+	// Beer
 	r.GET("/beer/:id", handlers.GetBeer)
-	// With id for editing beer?
+	r.GET("/beer/name/:name", handlers.GetBeerByUrlName)
 	r.POST("/beer", handlers.PostBeer)
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+
+	r.Run()
 }
