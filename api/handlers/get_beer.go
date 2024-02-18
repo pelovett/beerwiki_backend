@@ -22,10 +22,10 @@ func GetBeer(c *gin.Context) {
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-        log.Printf("Could not connect to database with error %s", err)
+		log.Printf("Could not connect to database with error %s", err)
 
-        c.Status(http.StatusInternalServerError);
-        return
+		c.Status(http.StatusInternalServerError)
+		return
 	}
 
 	id := c.Param("id")
