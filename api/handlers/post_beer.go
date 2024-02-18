@@ -1,14 +1,12 @@
 package handlers
 
 import (
-	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"github.com/pelovett/beerwiki_backend/db_wrapper"
 )
 
 type beer struct {
@@ -39,22 +37,9 @@ func PostBeer(c *gin.Context) {
 
 func addBeerDB(newBeer *beer) error {
 
-	db_host := os.Getenv("DB_HOST")
-	db_pass := os.Getenv("DB_PASSWORD")
-
-	psqlInfo := fmt.Sprintf("host=%s port=5432 user=postgres "+
-		"password=%s dbname=postgres sslmode=disable",
-		db_host, db_pass)
-
-	db, err := sql.Open("postgres", psqlInfo)
-
-	if err != nil {
-		log.Println(err)
-		return err
-	}
 
 	log.Println(newBeer.Name)
-	_, err = db.Exec("INSERT INTO beer (name) VALUES ($1);", newBeer.Name)
+    _, err := db_wrapper.ExecSQL("INSERT INTO beer (name) VALUES ($1);", newBeer.Name)
 
 	if err != nil {
 		log.Println(err)
