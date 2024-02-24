@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/pelovett/beerwiki_backend/db_wrapper"
@@ -24,13 +26,13 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	// hashedPassword, err := hashPassword(formData.Password)
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Error hashing password"})
-	// 	return
-	// }
+	hashedPassword, err := hashPassword(formData.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error hashing password"})
+		return
+	}
 
-	if createUserAccount(formData.Email, formData.Username, formData.Password, formData.CreatedAt) {
+	if createUserAccount(formData.Email, formData.Username, hashedPassword, formData.CreatedAt) {
 		c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Account created successfully for user: %s", formData.Username)})
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create account"})
@@ -52,4 +54,13 @@ func createUserAccount(email string, user_name string, password string, createdA
 	log.Println(output)
 
 	return true
+}
+
+func hashPassword(password string) (string, error) {
+	// Generate a salt with a cost of 10
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), nil
 }

@@ -20,6 +20,7 @@ func main() {
 
 	// Account Management
 	r.POST("/create-account", handlers.CreateUser)
+	r.GET("/login", handlers.VerifyUser)
 
 	// Beer
 	r.GET("/beer/:id", handlers.GetBeer)
@@ -28,6 +29,5 @@ func main() {
 
 	// Search
 	r.GET("/search/beer", handlers.SearchBeerByName)
-
 	r.Run()
 }
