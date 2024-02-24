@@ -14,7 +14,7 @@ import (
 
 func VerifyUser(c *gin.Context) {
 	type User struct {
-		Username string `json:"username"`
+		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
@@ -39,14 +39,14 @@ func VerifyUser(c *gin.Context) {
 	}
 
 	// Query the database for the user by username
-	row := db.QueryRow("SELECT user_name, password FROM users WHERE user_name = $1", user.Username)
+	row := db.QueryRow("SELECT email, password FROM users WHERE email = $1", user.Email)
 
-	var dbUsername, dbPassword string
+	var dbEmail, dbPassword string
 
-	err = row.Scan(&dbUsername, &dbPassword)
+	err = row.Scan(&dbEmail, &dbPassword)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 			return
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -54,7 +54,7 @@ func VerifyUser(c *gin.Context) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(dbPassword), []byte(user.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 		return
 	}
 
