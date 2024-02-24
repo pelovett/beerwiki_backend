@@ -26,5 +26,8 @@ func main() {
 	r.GET("/beer/name/:name", handlers.GetBeerByUrlName)
 	r.POST("/beer", handlers.PostBeer)
 
+	// Search
+	r.GET("/search/beer", handlers.SearchBeerByName)
+
 	r.Run()
 }
