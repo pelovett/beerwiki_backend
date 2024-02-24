@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
-    "fmt"
 	"regexp"
 
 	"github.com/gin-gonic/gin"
@@ -52,7 +52,7 @@ func PostBeer(c *gin.Context) {
 }
 
 func addBeerDB(newBeer *beer) error {
-	_, err := db_wrapper.ExecSQL("INSERT INTO beer (name, url_name, page_ipa_ml) VALUES ($1, $2 ,$3);",
+	_, err := db_wrapper.Exec("INSERT INTO beer (name, url_name, page_ipa_ml) VALUES ($1, $2 ,$3);",
 		newBeer.Name, newBeer.URLName, newBeer.PageIPAML)
 
 	if err != nil {
