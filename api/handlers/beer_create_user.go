@@ -1,15 +1,14 @@
 package handlers
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"github.com/pelovett/beerwiki_backend/db_wrapper"
 )
 
 func CreateUser(c *gin.Context) {
@@ -39,20 +38,12 @@ func CreateUser(c *gin.Context) {
 }
 
 func createUserAccount(email string, user_name string, password string, createdAt time.Time) bool {
-	db_host := os.Getenv("DB_HOST")
-	db_pass := os.Getenv("DB_PASSWORD")
-
-	psqlInfo := fmt.Sprintf("host=%s port=5432 user=postgres "+
-		"password=%s dbname=postgres sslmode=disable",
-		db_host, db_pass)
-
-	db, err := sql.Open("postgres", psqlInfo)
-
-	if err != nil {
-		panic(err)
-	}
-
-	output, err := db.Exec("INSERT INTO users (email, user_name, password, created_at) VALUES ($1, $2, $3, now() AT TIME ZONE 'UTC')", email, user_name, password)
+	output, err := db_wrapper.Exec(
+		"INSERT INTO users (email, user_name, password, created_at) VALUES ($1, $2, $3, now() AT TIME ZONE 'UTC')",
+		email,
+		user_name,
+		password,
+	)
 	if err != nil {
 		log.Println("Error creating user account:", err)
 		return false
