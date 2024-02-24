@@ -21,11 +21,14 @@ func SearchBeerByName(c *gin.Context) {
 		"SELECT name, url_name, similarity(name, $1) as sim FROM beer ORDER BY similarity(name, $1) DESC LIMIT 5;",
 		query[0],
 	)
+
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		log.Printf("Failed to search db: %s", err)
 		return
 	}
+
+	defer rows.Close()
 
 	// Iterate over the rows
 	results := []map[string]string{}

@@ -27,6 +27,9 @@ func main() {
 	r.GET("/beer/name/:name", handlers.GetBeerByUrlName)
 	r.POST("/beer", handlers.PostBeer)
 
+	// Random
+	r.GET("/randombeer/", handlers.GetRandomBeer)
+
 	// Search
 	r.GET("/search/beer", handlers.SearchBeerByName)
 	r.Run()
