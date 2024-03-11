@@ -6,10 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/pelovett/beerwiki_backend/api/handlers"
+	"github.com/pelovett/beerwiki_backend/middleware"
 )
 
 func main() {
 	r := gin.Default()
+
+	// Middleware
+	r.Use(middleware.CORS())
 
 	// Debug
 	r.GET("/ping", func(c *gin.Context) {
