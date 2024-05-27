@@ -23,8 +23,9 @@ func main() {
 	})
 
 	// Account Management
-	r.POST("/create-account", handlers.CreateUser)
-	r.GET("/login", handlers.VerifyUser)
+	r.POST("user/create-account", handlers.CreateUser)
+	r.POST("user/login", handlers.LoginUser)
+	r.POST("user/verify", handlers.VerifyUser)
 
 	// Beer
 	r.GET("/beer/:id", handlers.GetBeer)

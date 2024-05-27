@@ -1,63 +1,52 @@
 package handlers
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
 
-	"golang.org/x/crypto/bcrypt"
+	"github.com/golang-jwt/jwt"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
 
+type tokenString struct {
+	String string `json:"tokenString"`
+}
+
 func VerifyUser(c *gin.Context) {
-	type User struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
 
-	var user User
+	var newtokenString tokenString
 
-	if err := c.BindJSON(&user); err != nil {
+	secretKey := []byte(os.Getenv("SECRET_KEY"))
+
+	if err := c.BindJSON(&newtokenString); err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	db_host := os.Getenv("DB_HOST")
-	db_pass := os.Getenv("DB_PASSWORD")
+	token, err := jwt.Parse(newtokenString.String, func(token *jwt.Token) (interface{}, error) {
+		return secretKey, nil
+	})
 
-	psqlInfo := fmt.Sprintf("host=%s port=5432 user=postgres "+
-		"password=%s dbname=postgres sslmode=disable",
-		db_host, db_pass)
-
-	db, err := sql.Open("postgres", psqlInfo)
-
-	if err != nil {
-		panic(err)
-	}
-
-	// Query the database for the user by username
-	row := db.QueryRow("SELECT email, password FROM users WHERE email = $1", user.Email)
-
-	var dbEmail, dbPassword string
-
-	err = row.Scan(&dbEmail, &dbPassword)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
-			return
+	if token != nil {
+		if token.Valid {
+			c.JSON(http.StatusOK, gin.H{"message": "User verified successfully"})
+		} else if ve, ok := err.(*jwt.ValidationError); ok {
+			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
+				fmt.Println("That's not even a token")
+			} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
+				// Token is either expired or not active yet
+				fmt.Println("Timing is everything")
+			} else {
+				fmt.Println("Couldn't handletoken contains an invalid number of segments this token:", err)
+			}
+		} else {
+			fmt.Println("Couldn't handle this token:", err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+	} else {
+		fmt.Println("Token is nil:", err)
 	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(dbPassword), []byte(user.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
-		return
-	}
-
-	// Passwords match, user is verified
-	c.JSON(http.StatusOK, gin.H{"message": "User verified successfully"})
 }
