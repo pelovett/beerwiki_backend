@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -33,6 +34,17 @@ func LoginUser(c *gin.Context) {
 
 	db_host := os.Getenv("DB_HOST")
 	db_pass := os.Getenv("DB_PASSWORD")
+	server_address := os.Getenv("SERVER_ADDRESS")
+
+	// Parse the URL
+	u, err := url.Parse(server_address)
+	if err != nil {
+		fmt.Println("Error parsing URL:", err)
+		return
+	}
+
+	// Get the hostname (without port)
+	host_name := u.Hostname()
 
 	psqlInfo := fmt.Sprintf("host=%s port=5432 user=postgres "+
 		"password=%s dbname=postgres sslmode=disable",
@@ -78,6 +90,6 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("login_cookie", tokenString, 3600*24, "/", "localhost", false, false)
+	c.SetCookie("login_cookie", tokenString, 3600*24, "/", host_name, false, false)
 	c.JSON(http.StatusOK, gin.H{"message": "User logged in successfully"})
 }
