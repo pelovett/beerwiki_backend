@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -28,6 +29,11 @@ func CheckValidCookie(cookie string) int {
 
 	if token == nil {
 		fmt.Println("Token is nil: ", err)
+		return 0
+	}
+
+	// If token has expired, then its invalid
+	if claims.ExpiresAt < time.Now().UTC().Unix() {
 		return 0
 	}
 

@@ -68,11 +68,11 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 	// Passwords match, user is verified
-
+	// Token expires in 24 hours
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":      user.Email,
 		"account_id": accountId,
-		"nbf":        time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
+		"exp":        time.Now().UTC().Add(24 * time.Hour).Unix(),
 	})
 
 	secretKey := []byte(os.Getenv("SECRET_KEY"))
