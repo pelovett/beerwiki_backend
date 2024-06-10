@@ -5,7 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
-	"github.com/pelovett/beerwiki_backend/api/handlers"
+	"github.com/pelovett/beerwiki_backend/api/handlers/beer"
+	"github.com/pelovett/beerwiki_backend/api/handlers/image"
+	"github.com/pelovett/beerwiki_backend/api/handlers/user"
 	"github.com/pelovett/beerwiki_backend/middleware"
 )
 
@@ -23,18 +25,23 @@ func main() {
 	})
 
 	// Account Management
-	r.POST("/create-account", handlers.CreateUser)
-	r.GET("/login", handlers.VerifyUser)
+	r.POST("/create-account", user.CreateUser)
+	r.GET("/login", user.VerifyUser)
 
 	// Beer
-	r.GET("/beer/:id", handlers.GetBeer)
-	r.GET("/beer/name/:name", handlers.GetBeerByUrlName)
-	r.POST("/beer", handlers.PostBeer)
+	r.GET("/beer/:id", beer.GetBeer)
+	r.GET("/beer/name/:name", beer.GetBeerByUrlName)
+	r.POST("/beer", beer.PostBeer)
+
+	// Image
+	r.GET("/image/upload", image.GetImageUploadURL)
+	r.POST("/image/upload/complete", image.PostImageUploadComplete)
 
 	// Random
-	r.GET("/randombeer/", handlers.GetRandomBeer)
+	r.GET("/randombeer/", beer.GetRandomBeer)
 
 	// Search
-	r.GET("/search/beer", handlers.SearchBeerByName)
+	r.GET("/search/beer", beer.SearchBeerByName)
+
 	r.Run()
 }
