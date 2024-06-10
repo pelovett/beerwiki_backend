@@ -25,21 +25,34 @@ func main() {
 	})
 
 	// Account Management
-	r.POST("user/create-account", user.CreateUser)
-	r.POST("user/login", user.LoginUser)
-	r.POST("user/verify", user.VerifyUser)
+	userRoutes := r.Group("/user")
+	{
+		userRoutes.POST("/create-account", user.CreateUser)
+
+		userRoutes.Use(middleware.Login())
+		userRoutes.POST("/login", user.LoginUser)
+		userRoutes.GET("/verify", user.VerifyUser)
+	}
 
 	// Beer
-	r.GET("/beer/:id", beer.GetBeer)
-	r.GET("/beer/name/:name", beer.GetBeerByUrlName)
-	r.POST("/beer", beer.PostBeer)
+	beerRoutes := r.Group("/beer")
+	{
+
+		beerRoutes.GET("/:id", beer.GetBeer)
+		beerRoutes.GET("/name/:name", beer.GetBeerByUrlName)
+		beerRoutes.GET("/random", beer.GetRandomBeer)
+
+		beerRoutes.Use(middleware.Login())
+		beerRoutes.POST("/", beer.PostBeer)
+	}
 
 	// Image
-	r.GET("/image/upload", image.GetImageUploadURL)
-	r.POST("/image/upload/complete", image.PostImageUploadComplete)
-
-	// Random
-	r.GET("/randombeer/", beer.GetRandomBeer)
+	imageRoutes := r.Group("/image")
+	{
+		imageRoutes.Use(middleware.Login())
+		imageRoutes.GET("/upload", image.GetImageUploadURL)
+		imageRoutes.POST("/upload/complete", image.PostImageUploadComplete)
+	}
 
 	// Search
 	r.GET("/search/beer", beer.SearchBeerByName)

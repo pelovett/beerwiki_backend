@@ -18,6 +18,13 @@ type CompletedUploadInfo struct {
 
 // Get a cloudflare creator upload URL and store temp record
 func GetImageUploadURL(c *gin.Context) {
+	// Check that we have user account id in state
+	accountId := c.GetInt("account_id")
+	if accountId == 0 {
+		c.Status(http.StatusUnauthorized)
+		return
+	}
+
 	cfApi, err := cloudflare.NewWithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "Failed to contact image upload service")
@@ -44,7 +51,11 @@ func GetImageUploadURL(c *gin.Context) {
 	}
 
 	// Add id to db as in progress upload
-	_, err = db_wrapper.Exec("INSERT INTO image_metadata (image_id) VALUES ($1);", uploadUrlInfo.ID)
+	_, err = db_wrapper.Exec(
+		"INSERT INTO image_metadata (image_id, account_id) VALUES ($1, $2);",
+		uploadUrlInfo.ID,
+		accountId,
+	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "Failed to save image id in db")
 		log.Printf("Failed to save image id in postgres: %s", err)
@@ -75,9 +86,11 @@ func PostImageUploadComplete(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 	defer cancel()
 
-	_, err = cfApi.GetImage(ctx,
+	_, err = cfApi.GetImage(
+		ctx,
 		cloudflare.AccountIdentifier(os.Getenv("CLOUDFLARE_ACCOUNT_ID")),
-		uploadInfo.ID)
+		uploadInfo.ID,
+	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "Failed to retrieve image info")
 		log.Printf("Failed to get cf image info: %s", err)
