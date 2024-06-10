@@ -37,7 +37,6 @@ func main() {
 	// Beer
 	beerRoutes := r.Group("/beer")
 	{
-
 		beerRoutes.GET("/:id", beer.GetBeer)
 		beerRoutes.GET("/name/:name", beer.GetBeerByUrlName)
 		beerRoutes.GET("/random", beer.GetRandomBeer)
