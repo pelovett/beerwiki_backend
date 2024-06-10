@@ -11,23 +11,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type tokenString struct {
-	String string `json:"tokenString"`
-}
-
 func VerifyUser(c *gin.Context) {
 
-	var newtokenString tokenString
+	cookieValue := c.GetHeader("Cookie")
 
 	secretKey := []byte(os.Getenv("SECRET_KEY"))
 
-	if err := c.BindJSON(&newtokenString); err != nil {
-		fmt.Println(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	token, err := jwt.Parse(newtokenString.String, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(cookieValue, func(token *jwt.Token) (interface{}, error) {
 		return secretKey, nil
 	})
 
