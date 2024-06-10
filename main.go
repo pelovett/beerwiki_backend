@@ -5,7 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
-	"github.com/pelovett/beerwiki_backend/api/handlers"
+	"github.com/pelovett/beerwiki_backend/api/handlers/beer"
+	"github.com/pelovett/beerwiki_backend/api/handlers/image"
+	"github.com/pelovett/beerwiki_backend/api/handlers/user"
 	"github.com/pelovett/beerwiki_backend/middleware"
 )
 
@@ -23,19 +25,36 @@ func main() {
 	})
 
 	// Account Management
-	r.POST("user/create-account", handlers.CreateUser)
-	r.POST("user/login", handlers.LoginUser)
-	r.POST("user/verify", handlers.VerifyUser)
+	userRoutes := r.Group("/user")
+	{
+		userRoutes.POST("/create-account", user.CreateUser)
+
+		userRoutes.Use(middleware.Login())
+		userRoutes.POST("/login", user.LoginUser)
+		userRoutes.GET("/verify", user.VerifyUser)
+	}
 
 	// Beer
-	r.GET("/beer/:id", handlers.GetBeer)
-	r.GET("/beer/name/:name", handlers.GetBeerByUrlName)
-	r.POST("/beer", handlers.PostBeer)
+	beerRoutes := r.Group("/beer")
+	{
+		beerRoutes.GET("/:id", beer.GetBeer)
+		beerRoutes.GET("/name/:name", beer.GetBeerByUrlName)
+		beerRoutes.GET("/random", beer.GetRandomBeer)
 
-	// Random
-	r.GET("/randombeer/", handlers.GetRandomBeer)
+		beerRoutes.Use(middleware.Login())
+		beerRoutes.POST("/", beer.PostBeer)
+	}
+
+	// Image
+	imageRoutes := r.Group("/image")
+	{
+		imageRoutes.Use(middleware.Login())
+		imageRoutes.GET("/upload", image.GetImageUploadURL)
+		imageRoutes.POST("/upload/complete", image.PostImageUploadComplete)
+	}
 
 	// Search
-	r.GET("/search/beer", handlers.SearchBeerByName)
+	r.GET("/search/beer", beer.SearchBeerByName)
+
 	r.Run()
 }
