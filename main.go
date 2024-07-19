@@ -42,6 +42,7 @@ func main() {
 		beerRoutes.GET("/random", beer.GetRandomBeer)
 
 		beerRoutes.Use(middleware.Login())
+		beerRoutes.POST("/description", beer.PostBeerDescription)
 		beerRoutes.POST("/", beer.PostBeer)
 	}
 
