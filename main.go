@@ -48,7 +48,9 @@ func main() {
 	// Image
 	imageRoutes := r.Group("/image")
 	{
-		imageRoutes.Use(middleware.Login())
+		imageRoutes.GET("/view/:name", image.GetImageURL)
+
+		//imageRoutes.Use(middleware.Login())
 		imageRoutes.GET("/upload", image.GetImageUploadURL)
 		imageRoutes.POST("/upload/complete", image.PostImageUploadComplete)
 	}
