@@ -12,9 +12,8 @@ import (
 )
 
 type beer struct {
-	ID        int    `json:"id"`
-	Name      string `json:"name"`
 	URLName   string `json:"url_name"`
+	Name      string `json:"name"`
 	PageIPAML string `json:"page_ipa_ml"`
 }
 
