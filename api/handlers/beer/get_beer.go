@@ -13,7 +13,7 @@ import (
 func GetBeer(c *gin.Context) {
 	id := c.Param("id")
 	result, err := db_wrapper.Query(
-		"SELECT id, name, url_name, page_ipa_ml FROM beer WHERE id=$1 limit 1;",
+		"SELECT name, url_name, page_ipa_ml FROM beer WHERE id=$1 limit 1;",
 		id)
 
 	if err != nil {
@@ -26,7 +26,7 @@ func GetBeer(c *gin.Context) {
 
 	var foundBeer beer
 	if result.Next() {
-		if err := result.Scan(&foundBeer.ID, &foundBeer.Name, &foundBeer.URLName, &foundBeer.PageIPAML); err != nil {
+		if err := result.Scan(&foundBeer.Name, &foundBeer.URLName, &foundBeer.PageIPAML); err != nil {
 			log.Printf("Failed to parse beer string id: %s", id)
 		}
 	}
@@ -46,7 +46,7 @@ func GetBeerByUrlName(c *gin.Context) {
 
 	url_name := c.Param("name")
 	result, err := db_wrapper.Query(
-		"SELECT id, name, url_name, page_ipa_ml FROM beer WHERE url_name=$1 limit 1;",
+		"SELECT name, url_name, page_ipa_ml FROM beer WHERE url_name=$1 limit 1;",
 		url_name)
 
 	if err != nil {
@@ -59,7 +59,7 @@ func GetBeerByUrlName(c *gin.Context) {
 
 	var foundBeer beer
 	if result.Next() {
-		if err := result.Scan(&foundBeer.ID, &foundBeer.Name, &foundBeer.URLName, &foundBeer.PageIPAML); err != nil {
+		if err := result.Scan(&foundBeer.Name, &foundBeer.URLName, &foundBeer.PageIPAML); err != nil {
 			log.Printf("Failed to parse beer string url_name: %s", url_name)
 		}
 	}
