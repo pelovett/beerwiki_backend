@@ -29,9 +29,11 @@ func main() {
 	{
 		userRoutes.POST("/create-account", user.CreateUser)
 
+		userRoutes.POST("/confirmation", user.ConfirmUser)
+
 		userRoutes.Use(middleware.Login())
 		userRoutes.POST("/login", user.LoginUser)
-		userRoutes.GET("/verify", user.VerifyUser)
+		userRoutes.POST("/verify", user.VerifyUser)
 	}
 
 	// Beer

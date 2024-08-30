@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ func Login() gin.HandlerFunc {
 		// Try grabbing cookie from request
 		cookie, err := c.Cookie("login_cookie")
 		if err != nil {
+			fmt.Println(err)
 			c.Status(http.StatusUnauthorized)
 			return
 		}

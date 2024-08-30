@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	_ "github.com/lib/pq"
+	"github.com/pelovett/beerwiki_backend/db_wrapper"
 )
 
 type JwtClaims struct {
@@ -38,6 +39,7 @@ func CheckValidCookie(cookie string) int {
 	}
 
 	if token.Valid {
+
 		return claims.AccountId
 	}
 
@@ -58,9 +60,24 @@ func CheckValidCookie(cookie string) int {
 
 func VerifyUser(c *gin.Context) {
 	// If account isn't in state, we'll get 0 back
+	var verified bool
 	accountId := c.GetInt("account_id")
 	if accountId != 0 {
-		c.JSON(http.StatusOK, gin.H{"message": "User verified successfully"})
+		rows, err := db_wrapper.Query(`SELECT verified_at IS NOT NULL AS is_valid FROM users WHERE account_id = $1`, accountId)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid auth cookie provided"})
+		}
+		if rows.Next() {
+			// Scan the result into accountID
+			err := rows.Scan(&verified)
+			if err != nil {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "User not verified"})
+			} else if verified {
+				c.JSON(http.StatusOK, gin.H{"message": "User verified successfully"})
+			}
+
+		}
+
 	} else {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid auth cookie provided"})
 	}
