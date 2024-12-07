@@ -27,13 +27,17 @@ func main() {
 	// Account Management
 	userRoutes := r.Group("/user")
 	{
-		userRoutes.POST("/create-account", user.CreateUser)
+		userRoutes.GET("/logout-user", user.LogoutUser)
 
+		userRoutes.POST("/create-account", user.CreateUser)
 		userRoutes.POST("/confirmation", user.ConfirmUser)
+		userRoutes.POST("/forgot-password", user.ForgotPassword)
+		userRoutes.POST("/change-password", user.ChangePassword)
 
 		userRoutes.Use(middleware.Login())
 		userRoutes.POST("/login", user.LoginUser)
 		userRoutes.POST("/verify", user.VerifyUser)
+
 	}
 
 	// Beer

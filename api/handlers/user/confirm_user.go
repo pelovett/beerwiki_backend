@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/pelovett/beerwiki_backend/db_wrapper"
@@ -23,7 +24,7 @@ func ConfirmUser(c *gin.Context) {
 	}
 
 	// Check if the code exists in the database
-	account_id, exists, err := isCodeInDb(code.Code)
+	account_id, exists, err := isStringInDb(code.Code, "confirm_code")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database query failed"})
 		return
@@ -40,11 +41,11 @@ func ConfirmUser(c *gin.Context) {
 }
 
 // Define a function to check if the code exists
-func isCodeInDb(code string) (int, bool, error) {
+func isStringInDb(inputString string, columnName string) (int, bool, error) {
 
 	var accountID int
-	query := "SELECT account_id FROM users WHERE confirm_code = $1"
-	rows, err := db_wrapper.Query(query, code)
+	query := fmt.Sprintf("SELECT account_id FROM users WHERE %s = $1", columnName)
+	rows, err := db_wrapper.Query(query, inputString)
 	if err != nil {
 		return 0, false, err
 	}
@@ -56,7 +57,7 @@ func isCodeInDb(code string) (int, bool, error) {
 		if err != nil {
 			return 0, false, err
 		}
-		// Code found
+		// String found
 		return accountID, true, nil
 	}
 

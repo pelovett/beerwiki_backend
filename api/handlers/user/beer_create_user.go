@@ -50,7 +50,7 @@ func CreateUser(c *gin.Context) {
 	err = createUserAccount(createUserRequest.Email, createUserRequest.Username, hashedPassword, createUserRequest.CreatedAt, confirmCode)
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Account created successfully for user: %s", createUserRequest.Username)})
-		url, err := generateConfirmationURL(confirmCode)
+		url, err := generateURL(confirmCode, "/user/confirmation/")
 		if err != nil {
 			log.Println("Error creating user account:", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -129,17 +129,17 @@ func hashPassword(password string) (string, error) {
 }
 
 // GenerateConfirmationURL creates a URL for email confirmation with the provided confirmation code
-func generateConfirmationURL(confirmCode string) (string, error) {
+func generateURL(confirmCode string, urlPath string) (string, error) {
 	// Get the base URL from an environment variable
 	baseURL := os.Getenv("SERVER_ADDRESS")
 	if baseURL == "" {
 		return "", fmt.Errorf("SERVER_ADDRESS environment variable is not set")
 	}
 
-	confirmURL := baseURL + "/user/confirmation/"
+	fullURL := baseURL + urlPath
 
 	// Parse the base URL
-	u, err := url.Parse(confirmURL)
+	u, err := url.Parse(fullURL)
 	if err != nil {
 		return "", fmt.Errorf("error parsing base URL: %v", err)
 	}
@@ -151,6 +151,7 @@ func generateConfirmationURL(confirmCode string) (string, error) {
 
 	return u.String(), nil
 }
+
 func sendConfirmEmail(userEmail, confirmationLink string) error {
 	sess, err := session.NewSession(&aws.Config{})
 	if err != nil {
@@ -200,3 +201,4 @@ func sendConfirmEmail(userEmail, confirmationLink string) error {
 	_, err = svc.SendEmail(input)
 	return err
 }
+

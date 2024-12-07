@@ -1,0 +1,1 @@
+alter table users DROP COLUMN reset_at;

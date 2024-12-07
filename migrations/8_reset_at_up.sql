@@ -1,0 +1,1 @@
+alter table users ADD COLUMN reset_at TIMESTAMP WITH TIME ZONE;
