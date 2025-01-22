@@ -1,6 +1,8 @@
 module github.com/pelovett/beerwiki_backend
 
-go 1.18
+go 1.21
+
+toolchain go1.22.1
 
 require github.com/golang-jwt/jwt v3.2.2+incompatible
 
@@ -10,6 +12,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
 	github.com/lib/pq v1.10.9
+	github.com/lithammer/fuzzysearch v1.1.8
 	golang.org/x/crypto v0.23.0
 )
 
@@ -40,7 +43,7 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect

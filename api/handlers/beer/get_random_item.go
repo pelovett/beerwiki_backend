@@ -36,5 +36,4 @@ func GetRandomBeer(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"url_name": urlName})
-
 }

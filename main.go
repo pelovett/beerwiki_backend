@@ -1,18 +1,28 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/pelovett/beerwiki_backend/api/handlers/beer"
 	"github.com/pelovett/beerwiki_backend/api/handlers/image"
 	"github.com/pelovett/beerwiki_backend/api/handlers/user"
+	"github.com/pelovett/beerwiki_backend/api/handlers/util"
 	"github.com/pelovett/beerwiki_backend/middleware"
 )
 
 func main() {
 	r := gin.Default()
+	r.Use(gin.LoggerWithWriter(os.Stdout))
+
+	//  Load assets into memory
+	cityList, err := util.GetCityList()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Middleware
 	r.Use(middleware.CORS())
@@ -33,11 +43,10 @@ func main() {
 		userRoutes.POST("/confirmation", user.ConfirmUser)
 		userRoutes.POST("/forgot-password", user.ForgotPassword)
 		userRoutes.POST("/change-password", user.ChangePassword)
+		userRoutes.POST("/login", user.LoginUser)
 
 		userRoutes.Use(middleware.Login())
-		userRoutes.POST("/login", user.LoginUser)
 		userRoutes.POST("/verify", user.VerifyUser)
-
 	}
 
 	// Beer
@@ -60,6 +69,12 @@ func main() {
 		//imageRoutes.Use(middleware.Login())
 		imageRoutes.GET("/upload", image.GetImageUploadURL)
 		imageRoutes.POST("/upload/complete", image.PostImageUploadComplete)
+	}
+
+	// Utils
+	utilRoutes := r.Group("/util")
+	{
+		utilRoutes.GET("/city-search", util.SearchCities(cityList))
 	}
 
 	// Search
