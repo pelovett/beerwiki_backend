@@ -171,12 +171,14 @@ func GetImageURL(c *gin.Context) {
 	var imageId string
 	results.Scan(&imageId)
 
+	c.Writer.Header().Set("Cache-Control", "public, max-age=600, immutable")
 	c.JSON(
-		http.StatusAccepted,
-		fmt.Sprintf(
+		http.StatusOK,
+		gin.H{"url": fmt.Sprintf(
 			"https://imagedelivery.net/%s/%s/public",
 			os.Getenv("CLOUDFLARE_ACCOUNT_HASH"),
 			imageId,
 		),
+		},
 	)
 }
